@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123b75">
+<title>Ling Up B1 — English Game</title>
+<style>
+:root{--navy:#123b75;--green:#1f9d55;--yellow:#ffd447;--bg:#f3f7fb;--ink:#17243a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),#176b75);color:white;padding:24px 18px 28px;border-radius:0 0 24px 24px}
+.brand{font-size:27px;font-weight:850;letter-spacing:.2px}.brand span{color:var(--yellow)}header p{margin:5px 0 0;color:#e5efff}
+main{max-width:760px;margin:0 auto;padding:16px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:-10px}
+.stat,.panel{background:white;border-radius:16px;padding:15px;box-shadow:0 5px 18px #123b7510}
+.stat b{display:block;font-size:23px;color:var(--navy)}.stat small{color:#68758a}
+nav{display:flex;gap:8px;overflow:auto;margin:18px 0 12px}
+nav button{white-space:nowrap;border:0;border-radius:999px;padding:10px 14px;background:#e0eaf4;color:var(--navy);font-weight:700}
+nav button.active{background:var(--navy);color:white}
+.panel h2{margin:0 0 6px;font-size:20px}.muted{color:#68758a;font-size:14px}
+.question{font-size:18px;font-weight:750;margin:18px 0 12px}
+.answers{display:grid;gap:9px}.answers button,.primary{width:100%;border:0;border-radius:12px;padding:13px 14px;text-align:left;background:#eef4fa;color:var(--ink);font-weight:650}
+.answers button:active{transform:scale(.99)}.primary{background:var(--green);color:white;text-align:center;margin-top:14px}
+.feedback{min-height:25px;font-weight:700;margin-top:12px}.good{color:#16803e}.bad{color:#b42318}
+.word{font-size:27px;font-weight:850;color:var(--navy);letter-spacing:3px;margin:12px 0}
+input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:12px;font-size:17px}
+.list{padding-left:20px}.list li{margin:8px 0}.hidden{display:none}
+footer{text-align:center;color:#748094;padding:24px;font-size:12px}
+@media(max-width:420px){.stat{padding:11px}.stat b{font-size:20px}.brand{font-size:24px}}
+</style>
+</head>
+<body>
+<header><div class="brand">Ling <span>Up</span> B1</div><p>Learn • Grow • Succeed — English mini-game</p></header>
+<main>
+<section class="stats">
+ <div class="stat"><b id="xp">0 XP</b><small>Total points</small></div>
+ <div class="stat"><b id="streak">0</b><small>Correct today</small></div>
+ <div class="stat"><b id="level">B1</b><small>Your level</small></div>
+</section>
+<nav>
+ <button class="active" data-tab="quiz">🎯 Daily Mission</button>
+ <button data-tab="words">🔎 Word Detective</button>
+ <button data-tab="missions">🕵️ Secret Mission</button>
+ <button data-tab="rank">🏆 My Progress</button>
+</nav>
+<section id="quiz" class="panel">
+ <h2>🎯 Daily Mission</h2><div class="muted">Answer the B1 question. Each correct answer earns 10 XP.</div>
+ <div id="qcount" class="muted" style="margin-top:12px">Question 1</div>
+ <div id="question" class="question"></div><div id="answers" class="answers"></div>
+ <div id="feedback" class="feedback" aria-live="polite"></div>
+ <button id="next" class="primary hidden">Next question →</button>
+</section>
+<section id="words" class="panel hidden">
+ <h2>🔎 Word Detective</h2><div class="muted">Unscramble the letters to find the English word.</div>
+ <div id="scramble" class="word">N E L R A</div>
+ <div id="hint" class="muted"></div>
+ <input id="wordInput" placeholder="Type the word…" autocomplete="off">
+ <button id="checkWord" class="primary">Check word (+15 XP)</button>
+ <div id="wordFeedback" class="feedback" aria-live="polite"></div>
+ <button id="newWord" class="primary" style="background:#123b75">New word</button>
+</section>
+<section id="missions" class="panel hidden">
+ <h2>🕵️ Secret Mission</h2>
+ <p>Complete this mini-challenge to earn 20 XP.</p>
+ <p class="question">Write one sentence using <b>although</b>.</p>
+ <textarea id="sentence" rows="3" placeholder="Although it was raining, …" style="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:12px;font:inherit"></textarea>
+ <button id="submitSentence" class="primary">Complete mission</button>
+ <div id="missionFeedback" class="feedback" aria-live="polite"></div>
+ <p class="muted">This demo checks that you wrote a sentence; ask your teacher to check the grammar.</p>
+</section>
+<section id="rank" class="panel hidden">
+ <h2>🏆 My Progress</h2>
+ <p>Your XP is saved on this device in this browser.</p>
+ <ul class="list"><li>Daily Mission: +10 XP per correct answer</li><li>Word Detective: +15 XP for a correct word</li><li>Secret Mission: +20 XP when submitted</li></ul>
+ <p><b>XP:</b> <span id="progressXP">0</span></p>
+ <p class="muted">This starter version has local progress only. A shared class leaderboard and real multiplayer Voice Battle need a server/database and additional setup.</p>
+ <button id="reset" class="primary" style="background:#7a8798">Reset demo progress</button>
+</section>
+</main>
+<footer>Ling Up B1 • Starter demo • Keep learning every day!</footer>
+<script>
+const questions=[
+ {q:"Choose the correct sentence.",a:["If I will see him, I tell him.","If I see him, I will tell him.","If I saw him, I will tell him."],c:1,why:"First conditional: If + present simple, will + base verb."},
+ {q:"What does “reliable” mean?",a:["Can be trusted","Very expensive","Always late"],c:0,why:"Reliable means someone or something can be trusted."},
+ {q:"She has lived here ___ 2022.",a:["for","since","ago"],c:1,why:"Use since with a starting point in time."},
+ {q:"Choose the passive form: “They built the bridge in 2010.”",a:["The bridge built in 2010.","The bridge was built in 2010.","The bridge is build in 2010."],c:1,why:"Past simple passive = was/were + past participle."},
+ {q:"I’m interested ___ learning languages.",a:["on","at","in"],c:2,why:"The correct collocation is interested in."}
+];
+const words=[{w:"LEARN",hint:"To gain knowledge or a skill."},{w:"BRAVE",hint:"Ready to face danger or difficulty."},{w:"IMPROVE",hint:"To become better."},{w:"HONEST",hint:"Truthful; not telling lies."},{w:"ACHIEVE",hint:"To succeed in doing something."}];
+let xp=Number(localStorage.getItem("lingupXP")||0),correct=0,qi=0,answered=false,wi=0,wordDone=false,missionDone=false;
+const $=id=>document.getElementById(id);
+function update(){ $("xp").textContent=xp+" XP";$("progressXP").textContent=xp;$("streak").textContent=correct;$("level").textContent=xp>=200?"B1+": "B1";localStorage.setItem("lingupXP",xp); }
+function renderQ(){let q=questions[qi%questions.length];answered=false;$("qcount").textContent="Question "+(qi+1);$("question").textContent=q.q;$("feedback").textContent="";$("next").classList.add("hidden");$("answers").innerHTML="";q.a.forEach((a,i)=>{let b=document.createElement("button");b.textContent=String.fromCharCode(65+i)+". "+a;b.onclick=()=>pick(i);$("answers").appendChild(b);});}
+function pick(i){if(answered)return;answered=true;let q=questions[qi%questions.length];if(i===q.c){xp+=10;correct++;$("feedback").className="feedback good";$("feedback").textContent="Correct! +10 XP. "+q.why;}else{$("feedback").className="feedback bad";$("feedback").textContent="Not quite. "+q.why;}[...$("answers").children].forEach(b=>b.disabled=true);$("next").classList.remove("hidden");update();}
+$("next").onclick=()=>{qi++;renderQ();};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["quiz","words","missions","rank"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));});
+function renderWord(){wi=Math.floor(Math.random()*words.length);let w=words[wi].w;let s=w.split("");for(let i=s.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]];}if(s.join("")===w)s.push(s.shift());$("scramble").textContent=s.join(" ");$("hint").textContent="Hint: "+words[wi].hint;$("wordInput").value="";$("wordFeedback").textContent="";wordDone=false;}
+$("checkWord").onclick=()=>{if(wordDone)return;let val=$("wordInput").value.trim().toUpperCase();if(val===words[wi].w){xp+=15;wordDone=true;$("wordFeedback").className="feedback good";$("wordFeedback").textContent="Solved! +15 XP";update();}else{$("wordFeedback").className="feedback bad";$("wordFeedback").textContent="Try again. Check the hint!";}};
+$("newWord").onclick=renderWord;
+$("submitSentence").onclick=()=>{if(missionDone){$("missionFeedback").textContent="Mission already completed in this session.";return;}let s=$("sentence").value.trim();if(s.length<12||!s.toLowerCase().includes("although")){$("missionFeedback").className="feedback bad";$("missionFeedback").textContent="Write a full sentence containing “although” first.";return;}missionDone=true;xp+=20;$("missionFeedback").className="feedback good";$("missionFeedback").textContent="Mission submitted! +20 XP. Ask your teacher to check it.";update();};
+$("reset").onclick=()=>{if(confirm("Reset the saved demo XP on this device?")){xp=0;correct=0;qi=0;localStorage.removeItem("lingupXP");update();renderQ();}};
+renderQ();renderWord();update();
+</script>
+</body></html>
